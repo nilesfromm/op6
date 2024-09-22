@@ -1,0 +1,113 @@
+graph FM [[main]]
+{
+
+    input value float pan [[name: "Pan 1", min: -1.0, max: 1.0, init: 0.0]];
+    input value float amp [[name: "Amp 1", min: 0.0, max: 1.0, init: 1.0]];
+
+    input modulator.frequencyIn [[ name: "Modulator Frequency", min: 0, max: 600.0f, init: 200.0f ]];
+    input event float32 modDepth1 [[ name: "depth1", min: 0, max: 1000.0f, init: 100.0f ]];
+    input event float32 modDepth2 [[ name: "depth2", min: 0, max: 1000.0f, init: 100.0f ]];
+
+    input event float32 freqIn1 [[ name: "Freq1", min: 1, max: 600.0f, init: 440.0f ]];
+    input event float32 freqIn2 [[ name: "Freq2", min: 1, max: 600.0f, init: 440.0f ]];
+ 
+    output stream float<2> audioOut;
+ 
+    node carrier1 = Carrier (float, 440, 100);
+    node carrier2 = Carrier (float, 440, 100);
+
+    node panner = PanMix;
+    
+    node modulator = std::oscillators::Sine (float, 220);
+ 
+    float gain (float inValue)
+    {
+        return 0.5f + (inValue * 0.5f);
+    }
+
+    connection
+    {
+        modulator -> panner.panModIn;
+        amp -> panner.amp;
+
+        freqIn1 -> carrier1.frequencyIn;
+        freqIn2 -> carrier2.frequencyIn;
+
+        // modulator -> carrier2.modIn;
+        carrier2 -> carrier1.modIn;
+
+        modDepth1 -> carrier1.modDepthIn;
+        modDepth2 -> carrier2.modDepthIn;
+
+        carrier1.out -> std::levels::ConstantGain (float, 0.25f) -> panner.in;
+        
+        panner.out -> audioOut;
+    }
+}
+ 
+processor Carrier (using FrameType, float32 initialFrequency = 440.0f, float32 initialModDepth = 100.0f)
+{
+    input stream float32 modIn;
+    input event float32 frequencyIn [[ name: "Frequency", min: 0, max: 240.0f, init: 200.0f, unit: "Hz" ]];
+    input event float32 modDepthIn [[ name: "Mod Depth", min: 0, max: 1000.0f, init: 100.0f ]];
+ 
+    output stream FrameType out;
+ 
+    std::oscillators::PhasorState phasor;
+    float32 modDepth;
+    float32 baseFrequency;
+ 
+    void init()
+    {
+        baseFrequency = initialFrequency;
+        phasor.setFrequency(processor.frequency, baseFrequency);
+        modDepth = initialModDepth;
+    }
+ 
+    event frequencyIn (float32 newFrequency)
+    {
+        baseFrequency = newFrequency;
+        phasor.setFrequency (processor.frequency, baseFrequency);
+    }
+    event modDepthIn (float32 newModDepth) { modDepth = newModDepth; }
+ 
+    void main()
+    {
+        loop
+        {
+            float32 modValue = modIn * modDepth;
+            float32 instantaneousFreq = baseFrequency + modValue;
+ 
+            phasor.setFrequency(processor.frequency, instantaneousFreq);
+ 
+            out <- FrameType (sin (phasor.next() * float32 (twoPi)));
+            advance();
+        }
+    }
+}
+
+processor PanMix
+    {
+        input stream float32 panModIn;
+        input value float pan [[name: "Pan", min: -1.0, max: 1.0, init: 0.0]];
+        input value float amp [[name: "Amp", min: 0.0, max: 1.0, init: 1.0]];
+
+        input stream float in;
+        output stream float<2> out;
+
+        float gain (float inValue, float dir)
+        {
+            return 0.5f + (dir * inValue * 0.5f);
+        }
+
+        void main()
+        {
+            loop
+            {
+                float<2> gains = std::pan_law::linear (pan);
+                out <- float<2> (in * gain( panModIn, -1.0f ), in * gain( panModIn, 1.0f ));
+                // out <- float<2> (in,in);
+                advance();
+            }
+        }
+    }

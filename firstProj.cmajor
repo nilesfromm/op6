@@ -1,0 +1,225 @@
+graph FM [[main]]
+{
+    output stream float audioOut;
+
+    input event float32 osc0_frq [[ name: "Freq_0", min: 0.0, max: 1000.0, init: 85.23 ]];
+    input event float32 osc0_amp  [[ name: "Amp_0", min: 0.0, max: 1.0, init: 0.5 ]];
+    input event int osc0_con;
+
+    input event float32 osc1_frq [[ name: "Freq_1", min: 0.0, max: 1000.0, init: 61.93 ]];
+    input event float32 osc1_amp  [[ name: "Amp_1", min: 0.0, max: 1.0, init: 0.35 ]];
+    input event int osc1_con;
+
+    input event float32 osc2_frq [[ name: "Freq_2", min: 0.0, max: 1000.0, init: 60.80 ]];
+    input event float32 osc2_amp  [[ name: "Amp_2", min: 0.0, max: 1.0, init: 0.255 ]];
+    input event int osc2_con;
+
+    input event float32 osc3_frq [[ name: "Freq_3", min: 0.0, max: 1000.0, init: 234.5 ]];
+    input event float32 osc3_amp  [[ name: "Amp_3", min: 0.0, max: 1.0, init: 0.5 ]];
+    input event int osc3_con;
+
+    input event float32 osc4_frq [[ name: "Freq_4", min: 0.0, max: 1000.0, init: 85.23 ]];
+    input event float32 osc4_amp  [[ name: "Amp_4", min: 0.0, max: 1.0, init: 0.5 ]];
+    input event int osc4_con;
+
+    input event float32 osc5_frq [[ name: "Freq_5", min: 0.0, max: 1000.0, init: 155.0 ]];
+    input event float32 osc5_amp  [[ name: "Amp_5", min: 0.0, max: 1.0, init: 0.5 ]];
+    input event int osc5_con;
+
+    node osc0 = OSC (float, 440, 100);
+    node osc1 = OSC (float, 440, 100);
+    node osc2 = OSC (float, 440, 100);
+    node osc3 = OSC (float, 440, 100);
+    node osc4 = OSC (float, 440, 100);
+    node osc5 = OSC (float, 440, 100);
+
+    node patcher0 = Patcher (float, 1);
+    node patcher1 = Patcher (float, 4);
+    node patcher2 = Patcher (float, 7);
+    node patcher3 = Patcher (float, 10);
+    node patcher4 = Patcher (float, 13);
+    node patcher5 = Patcher (float, 16);
+
+    node gain = std::levels::ConstantGain (float, 0.25f);
+
+    connection
+    {
+        osc0_frq -> osc0.frequencyIn;
+        osc0_amp -> osc0.ampIn;
+        osc0 -> patcher0.osc;
+        osc0_con -> patcher0.con;
+
+        osc1_frq -> osc1.frequencyIn;
+        osc1_amp -> osc1.ampIn;
+        osc1 -> patcher1.osc;
+        osc1_con -> patcher1.con;
+
+        osc2_frq -> osc2.frequencyIn;
+        osc2_amp -> osc2.ampIn;
+        osc2 -> patcher2.osc;
+        osc2_con -> patcher2.con;
+
+        osc3_frq -> osc3.frequencyIn;
+        osc3_amp -> osc3.ampIn;
+        osc3 -> patcher3.osc;
+        osc3_con -> patcher3.con;
+
+        osc4_frq -> osc4.frequencyIn;
+        osc4_amp -> osc4.ampIn;
+        osc4 -> patcher4.osc;
+        osc4_con -> patcher4.con;
+
+        osc5_frq -> osc5.frequencyIn;
+        osc5_amp -> osc5.ampIn;
+        osc5 -> patcher5.osc;
+        osc5_con -> patcher5.con;
+
+        patcher0.freqMod0, patcher1.freqMod0, patcher2.freqMod0, patcher3.freqMod0, patcher4.freqMod0, patcher5.freqMod0 -> [1] -> osc0.freqModIn;
+        patcher0.ampMod0, patcher1.ampMod0, patcher2.ampMod0, patcher3.ampMod0, patcher4.ampMod0, patcher5.ampMod0 -> [1] -> osc0.ampModIn;
+
+        patcher0.freqMod1, patcher1.freqMod1, patcher2.freqMod1, patcher3.freqMod1, patcher4.freqMod1, patcher5.freqMod1 -> [1] -> osc1.freqModIn;
+        patcher0.ampMod1, patcher1.ampMod1, patcher2.ampMod1, patcher3.ampMod1, patcher4.ampMod1, patcher5.ampMod1 -> [1] -> osc1.ampModIn;
+        
+        patcher0.freqMod2, patcher1.freqMod2, patcher2.freqMod2, patcher3.freqMod2, patcher4.freqMod2, patcher5.freqMod2 -> [1] -> osc2.freqModIn;
+        patcher0.ampMod2, patcher1.ampMod2, patcher2.ampMod2, patcher3.ampMod2, patcher4.ampMod2, patcher5.ampMod2 -> [1] -> osc2.ampModIn;
+        
+        patcher0.freqMod3, patcher1.freqMod3, patcher2.freqMod3, patcher3.freqMod3, patcher4.freqMod3, patcher5.freqMod3 -> [1] -> osc3.freqModIn;
+        patcher0.ampMod3, patcher1.ampMod3, patcher2.ampMod3, patcher3.ampMod3, patcher4.ampMod3, patcher5.ampMod3 -> [1] -> osc3.ampModIn;
+        
+        patcher0.freqMod4, patcher1.freqMod4, patcher2.freqMod4, patcher3.freqMod4, patcher4.freqMod4, patcher5.freqMod4 -> [1] -> osc4.freqModIn;
+        patcher0.ampMod4, patcher1.ampMod4, patcher2.ampMod4, patcher3.ampMod4, patcher4.ampMod4, patcher5.ampMod4 -> [1] -> osc4.ampModIn;
+        
+        patcher0.freqMod5, patcher1.freqMod5, patcher2.freqMod5, patcher3.freqMod5, patcher4.freqMod5, patcher5.freqMod5 -> [1] -> osc5.freqModIn;
+        patcher0.ampMod5, patcher1.ampMod5, patcher2.ampMod5, patcher3.ampMod5, patcher4.ampMod5, patcher5.ampMod5 -> [1] -> osc5.ampModIn;
+
+        patcher0.out, patcher1.out, patcher2.out, patcher3.out, patcher4.out, patcher5.out -> gain -> audioOut;
+
+        // osc1, osc2, osc3, osc4, osc5 -> gain -> audioOut;
+    }
+}
+
+processor Patcher (using FrameType, int index = 0)
+{
+    input event int con;
+
+    input stream FrameType osc;
+
+    output stream FrameType freqMod0;
+    output stream FrameType freqMod1;
+    output stream FrameType freqMod2;
+    output stream FrameType freqMod3;
+    output stream FrameType freqMod4;
+    output stream FrameType freqMod5;
+
+    output stream FrameType ampMod0;
+    output stream FrameType ampMod1;
+    output stream FrameType ampMod2;
+    output stream FrameType ampMod3;
+    output stream FrameType ampMod4;
+    output stream FrameType ampMod5;
+    
+    output stream FrameType out;
+
+    int[18] c1; // connections for osc1 output
+    int normalizedOut = 1;
+
+    event con (int newConnection)
+    {
+        if(newConnection != 0)
+        {
+            normalizedOut = 0;
+        }
+        else
+        {
+            normalizedOut = 1;
+        }
+        for(int i = 0; i < 18; i++)
+        {
+            c1[wrap<18>(i)] = (newConnection>>i) & 1;
+            console <- c1[wrap<18>(i)];
+        }
+        console <- "\n" <- "-" <- "\n";
+        // wrap<3> wrappedInt = wrap<3>(newConnection);
+        // c1[:] = 0; 
+        // c1[wrappedInt] = 1;
+        // console <- "\n" <- c1;
+    }
+
+    void main()
+    {
+        loop
+        {
+            out <- osc * wrap<2>(normalizedOut + c1[index]);
+            freqMod0 <- osc * c1[0];
+            ampMod0 <- osc * c1[2];
+            freqMod1 <- osc * c1[3];
+            ampMod1 <- osc * c1[5];
+            freqMod2 <- osc * c1[6];
+            ampMod2 <- osc * c1[8];
+            freqMod3 <- osc * c1[9];
+            ampMod3 <- osc * c1[11];
+            freqMod4 <- osc * c1[12];
+            ampMod4 <- osc * c1[14];
+            freqMod5 <- osc * c1[15];
+            ampMod5 <- osc * c1[17];
+            
+            advance();
+        }
+    }
+}
+
+processor OSC (using FrameType, float32 initialFrequency = 440.0f, float32 initialModDepth = 100.0f)
+{
+    input stream float32 freqModIn;
+    input stream float32 ampModIn;
+    input event float32 frequencyIn [[ name: "Frequency", min: 0, max: 240.0f, init: 200.0f, unit: "Hz" ]];
+    input event float32 ampIn [[ name: "Amplitude", min: 0, max: 1.0, init: 1.0]];
+    input value float32 conIn [[ name: "Connect", min: 0, max: 1.0, init: 0.0]];
+    // input event float32 modDepthIn [[ name: "Mod Depth", min: 0, max: 1000.0f, init: 100.0f ]];
+ 
+    output stream FrameType out;
+ 
+    std::oscillators::PhasorState phasor;
+    float32 baseFrequency;
+    float32 baseAmp;
+    float32 connect;
+
+    float32 ampModValue;
+ 
+    void init()
+    {
+        baseFrequency = initialFrequency;
+        phasor.setFrequency(processor.frequency, baseFrequency);
+    }
+ 
+    event frequencyIn (float32 newFrequency)
+    {
+        baseFrequency = newFrequency;
+        phasor.setFrequency (processor.frequency, baseFrequency);
+    }
+
+    event ampIn (float32 newAmp)
+    {
+        baseAmp = newAmp;
+    }
+
+    // event conIn (float32 newCon)
+    // {
+    //     connect = newCon;
+    // }
+ 
+    void main()
+    {
+        loop
+        {
+            float32 freqModValue = baseFrequency + (freqModIn * 100.0f);
+
+            ampModValue = baseAmp + (baseAmp * ampModIn);
+ 
+            phasor.setFrequency(processor.frequency, freqModValue);
+ 
+            out <- FrameType (sin (phasor.next() * float32 (twoPi))) * ampModValue;
+            advance();
+        }
+    }
+}
