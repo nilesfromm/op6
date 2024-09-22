@@ -94,7 +94,6 @@ graph FM [[main]]
 
         patcher0.out, patcher1.out, patcher2.out, patcher3.out, patcher4.out, patcher5.out -> gain -> audioOut;
 
-        // osc1, osc2, osc3, osc4, osc5 -> gain -> audioOut;
     }
 }
 
@@ -120,29 +119,19 @@ processor Patcher (using FrameType, int index = 0)
     
     output stream FrameType out;
 
-    int[18] c1; // connections for osc1 output
+    int[18] c1;
     int normalizedOut = 1;
 
     event con (int newConnection)
     {
-        if(newConnection != 0)
-        {
-            normalizedOut = 0;
-        }
-        else
-        {
-            normalizedOut = 1;
-        }
+        normalizedOut = newConnection == 0 ? 1 : 0;
+
         for(int i = 0; i < 18; i++)
         {
             c1[wrap<18>(i)] = (newConnection>>i) & 1;
             console <- c1[wrap<18>(i)];
         }
         console <- "\n" <- "-" <- "\n";
-        // wrap<3> wrappedInt = wrap<3>(newConnection);
-        // c1[:] = 0; 
-        // c1[wrappedInt] = 1;
-        // console <- "\n" <- c1;
     }
 
     void main()
@@ -175,7 +164,6 @@ processor OSC (using FrameType, float32 initialFrequency = 440.0f, float32 initi
     input event float32 frequencyIn [[ name: "Frequency", min: 0, max: 240.0f, init: 200.0f, unit: "Hz" ]];
     input event float32 ampIn [[ name: "Amplitude", min: 0, max: 1.0, init: 1.0]];
     input value float32 conIn [[ name: "Connect", min: 0, max: 1.0, init: 0.0]];
-    // input event float32 modDepthIn [[ name: "Mod Depth", min: 0, max: 1000.0f, init: 100.0f ]];
  
     output stream FrameType out;
  
@@ -202,11 +190,6 @@ processor OSC (using FrameType, float32 initialFrequency = 440.0f, float32 initi
     {
         baseAmp = newAmp;
     }
-
-    // event conIn (float32 newCon)
-    // {
-    //     connect = newCon;
-    // }
  
     void main()
     {
